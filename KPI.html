@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo Cáo KPI</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/11.3.0/highcharts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/11.3.0/modules/exporting.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/11.3.0/modules/export-data.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/11.3.0/modules/accessibility.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="animate-spin rounded-full h-32 w-32 border-b-2 border-white"></div>
+    </div>
+
+    <div class="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
+        <!-- Header Section - Responsive -->
+        <div class="mb-4 sm:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Báo Cáo KPI Chi Tiết</h1>
+                <p class="text-sm sm:text-base text-gray-600">Theo dõi và phân tích hiệu suất KPI</p>
+            </div>
+            <!-- Responsive Filter Section -->
+            <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                <!-- Filter Position -->
+                <div class="relative">
+                    <select id="filterPosition"
+                        class="appearance-none w-full bg-white border border-gray-300 px-4 py-2 pr-8 rounded-lg shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400">
+                        <option value="">🏢 Tất cả vị trí</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                        <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Filter Bậc -->
+                <div class="relative">
+                    <select id="filterBac"
+                        class="appearance-none w-full bg-white border border-gray-300 px-4 py-2 pr-8 rounded-lg shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400">
+                        <option value="">📊 Tất cả Bậc</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                        <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Filter Nhóm -->
+                <div class="relative">
+                    <select id="filterNhomTieuChi"
+                        class="appearance-none w-full bg-white border border-gray-300 px-4 py-2 pr-8 rounded-lg shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400">
+                        <option value="">📑 Tất cả Nhóm</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                        <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- KPI Summary Cards - Responsive Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-6 mb-4 sm:mb-8">
+            <!-- Card 1 -->
+            <div
+                class="bg-white rounded-lg shadow p-4 sm:p-6 transform hover:scale-105 transition-transform duration-200">
+                <h3 class="text-base sm:text-lg font-semibold text-gray-700 mb-2">Tổng số tiêu chí</h3>
+                <p class="text-2xl sm:text-3xl font-bold text-blue-600" id="totalCriteria">0</p>
+            </div>
+            <!-- Card 2 -->
+            <div
+                class="bg-white rounded-lg shadow p-4 sm:p-6 transform hover:scale-105 transition-transform duration-200">
+                <h3 class="text-base sm:text-lg font-semibold text-gray-700 mb-2">KPI Trung bình</h3>
+                <p class="text-2xl sm:text-3xl font-bold text-green-600" id="averageKPI">0%</p>
+                <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                    <div class="bg-green-600 h-2.5 rounded-full" id="kpiProgress"></div>
+                </div>
+            </div>
+            <!-- Cards 3-5 -->
+            <div
+                class="bg-white rounded-lg shadow p-4 sm:p-6 transform hover:scale-105 transition-transform duration-200">
+                <h3 class="text-base sm:text-lg font-semibold text-gray-700 mb-2">Tổng thưởng tiêu chuẩn</h3>
+                <p class="text-2xl sm:text-3xl font-bold text-purple-600" id="totalStandardReward">0 ₫</p>
+            </div>
+            <div
+                class="bg-white rounded-lg shadow p-4 sm:p-6 transform hover:scale-105 transition-transform duration-200">
+                <h3 class="text-base sm:text-lg font-semibold text-gray-700 mb-2">Tổng thưởng AP</h3>
+                <p class="text-2xl sm:text-3xl font-bold text-indigo-600" id="totalAPReward">0 ₫</p>
+            </div>
+            <div
+                class="bg-white rounded-lg shadow p-4 sm:p-6 transform hover:scale-105 transition-transform duration-200">
+                <h3 class="text-base sm:text-lg font-semibold text-gray-700 mb-2">Tổng thưởng QU</h3>
+                <p class="text-2xl sm:text-3xl font-bold text-pink-600" id="totalQUReward">0 ₫</p>
+            </div>
+        </div>
+
+        <!-- Charts Row - Responsive -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-8">
+            <div class="bg-white rounded-lg shadow p-3 sm:p-6">
+                <div id="kpiDistributionChart" style="height: 300px;"></div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-3 sm:p-6">
+                <div id="kpiByLevelChart" style="height: 300px;"></div>
+            </div>
+        </div>
+
+        <!-- Table Section - Responsive -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="p-3 sm:p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <h2 class="text-lg sm:text-xl font-semibold text-gray-800">Chi tiết tiêu chí KPI</h2>
+                <input type="text" id="searchTable" placeholder="Tìm kiếm..."
+                    class="w-full sm:w-auto px-3 sm:px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+            </div>
+            <!-- Responsive Table -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th
+                                class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                                Tên tiêu chí ▼
+                            </th>
+                            <th
+                                class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                                Bậc ▼
+                            </th>
+                            <th
+                                class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                                Trọng số ▼
+                            </th>
+                            <th
+                                class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                                KPI ▼
+                            </th>
+                            <th
+                                class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                                ĐVT ▼
+                            </th>
+                            <th
+                                class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                                Thưởng TC (₫) ▼
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200" id="kpiTableBody"></tbody>
+                </table>
+            </div>
+            <!-- Responsive Pagination -->
+            <div class="p-3 sm:p-4 border-t">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-3">
+                    <p class="text-xs sm:text-sm text-gray-700" id="tableInfo">
+                        Hiển thị <span id="currentEntries">0</span> trên tổng số <span id="totalEntries">0</span> mục
+                    </p>
+                    <div class="flex gap-2">
+                        <button id="prevPage"
+                            class="px-3 sm:px-4 py-1 sm:py-2 border rounded-lg hover:bg-gray-100 text-sm">Trước</button>
+                        <span id="pagination" class="flex gap-1 sm:gap-2 text-sm"></span>
+                        <button id="nextPage"
+                            class="px-3 sm:px-4 py-1 sm:py-2 border rounded-lg hover:bg-gray-100 text-sm">Sau</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let originalData = [];
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let sortColumn = 'Bậc';
+        let sortDirection = 'asc';
+
+        // Your existing API functions remain the same
+        const appId = 'e6017786-8311-4f98-9160-0ffa00686169';
+        const apiKey = 'V2-XsBEC-P7YR6-LBK2m-dYhVj-9SVNm-FUoLC-6HLgb-RP2Za';
+
+        async function apiRequest(tableName, action, data) {
+            const apiUrl = `https://www.appsheet.com/api/v2/apps/${appId}/tables/${tableName}/Action`;
+            try {
+                return await $.ajax({
+                    url: apiUrl,
+                    method: 'POST',
+                    headers: {
+                        'ApplicationAccessKey': apiKey,
+                        'Content-Type': 'application/json'
+                    },
+                    data: JSON.stringify({
+                        Action: action,
+                        Properties: {
+                            Locale: 'vi-VN',
+                            Timezone: 'Asia/Ho_Chi_Minh'
+                        },
+                        ...data
+                    })
+                });
+            } catch (error) {
+                console.error(`API request error for ${tableName}:`, error);
+                throw error;
+            }
+        }
+
+        async function fetchDataFromAppSheet(tableName) {
+            try {
+                const response = await apiRequest(tableName, 'Find', {});
+                console.log(response);
+                if (Array.isArray(response)) return response;
+                if (typeof response === 'object' && Object.keys(response).length > 0) return [response];
+                return null;
+            } catch (error) {
+                console.error(`Lỗi khi lấy dữ liệu từ ${tableName}:`, error);
+                throw error;
+            }
+        }
+
+        // 1. Thêm hàm xử lý loading state
+        function showLoading(message = 'Đang tải dữ liệu...') {
+            const spinner = document.getElementById('loadingSpinner');
+            spinner.innerHTML = `
+        <div class="bg-white p-8 rounded-lg flex flex-col items-center">
+            <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
+            <p class="mt-4 text-gray-600">${message}</p>
+        </div>
+    `;
+            spinner.style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingSpinner').style.display = 'none';
+        }
+
+        // 2. Thêm hệ thống thông báo toast
+        function createToastContainer() {
+            const container = document.createElement('div');
+            container.id = 'toastContainer';
+            container.className = 'fixed bottom-4 right-4 z-50 flex flex-col gap-2';
+            document.body.appendChild(container);
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                info: 'bg-blue-500',
+                warning: 'bg-yellow-500'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full`;
+            toast.innerHTML = message;
+
+            container.appendChild(toast);
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-x-full');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // 3. Thêm shortcuts và tooltip helpers
+        function initializeKeyboardShortcuts() {
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey || e.metaKey) {
+                    switch (e.key) {
+                        case 'f':
+                            e.preventDefault();
+                            document.getElementById('searchTable').focus();
+                            break;
+                        case 'ArrowLeft':
+                            e.preventDefault();
+                            document.getElementById('prevPage').click();
+                            break;
+                        case 'ArrowRight':
+                            e.preventDefault();
+                            document.getElementById('nextPage').click();
+                            break;
+                    }
+                }
+            });
+        }
+
+        // 4. Cải thiện tương tác bảng
+        function enhanceTableInteraction() {
+            const table = document.querySelector('table');
+            let lastClickedRow = null;
+
+            table.addEventListener('click', (e) => {
+                const row = e.target.closest('tr');
+                if (!row || !row.classList.contains('hover:bg-gray-50')) return;
+
+                if (lastClickedRow) {
+                    lastClickedRow.classList.remove('bg-blue-50');
+                }
+                row.classList.add('bg-blue-50');
+                lastClickedRow = row;
+            });
+        }
+
+
+        // 6. Cải thiện phản hồi người dùng cho các hành động
+        function enhanceUserFeedback() {
+            // Cải thiện filter feedback
+            const filters = document.querySelectorAll('select');
+            filters.forEach(filter => {
+                filter.addEventListener('change', () => {
+                    showToast(`Đã lọc theo ${filter.options[filter.selectedIndex].text}`, 'info');
+                });
+            });
+
+            // Thêm tooltip cho các nút
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                if (button.textContent.includes('Trước')) {
+                    button.title = 'Trang trước (Ctrl + ←)';
+                } else if (button.textContent.includes('Sau')) {
+                    button.title = 'Trang sau (Ctrl + →)';
+                }
+            });
+
+            // Cải thiện search feedback
+            // const searchInput = document.getElementById('searchTable');
+            // searchInput.title = 'Tìm kiếm (Ctrl + F)';
+            // searchInput.addEventListener('input', () => {
+            //     if (searchInput.value.length > 0) {
+            //         showToast(`Đang tìm kiếm: ${searchInput.value}`, 'info');
+            //     }
+            // });
+        }
+
+        // 7. Initialize tất cả các tính năng mới
+        function initializeEnhancements() {
+            createToastContainer();
+            initializeKeyboardShortcuts();
+            enhanceTableInteraction();
+            enhanceUserFeedback();
+        }
+
+        function updateCharts(data) {
+            // Lọc ra các chỉ tiêu có ĐVT là %
+            const percentageKPIs = data.filter(item => item.ĐVT === '%');
+
+            // KPI Distribution Chart - chỉ hiển thị cho KPI dạng %
+            Highcharts.chart('kpiDistributionChart', {
+                chart: { type: 'column' },
+                title: { text: 'Phân bố KPI theo nhóm tiêu chí (%)' },
+                xAxis: {
+                    categories: [...new Set(percentageKPIs.map(item => item['Nhóm tiêu chí']))],
+                    title: { text: 'Nhóm tiêu chí' }
+                },
+                yAxis: {
+                    title: { text: 'KPI (%)' },
+                    min: 0,
+                    max: 100
+                },
+                tooltip: {
+                    formatter: function () {
+                        const itemsInGroup = percentageKPIs.filter(item => item['Nhóm tiêu chí'] === this.x);
+                        return `<b>${this.x}</b><br/>
+                        KPI trung bình: ${this.y.toFixed(1)}%<br/>
+                        Số tiêu chí: ${itemsInGroup.length}`;
+                    }
+                },
+                plotOptions: {
+                    column: {
+                        colorByPoint: true,
+                        borderRadius: 5
+                    }
+                },
+                series: [{
+                    name: 'KPI',
+                    data: [...new Set(percentageKPIs.map(item => item['Nhóm tiêu chí']))].map(group => ({
+                        y: percentageKPIs.filter(item => item['Nhóm tiêu chí'] === group)
+                            .reduce((sum, item) => sum + parseFloat(item.KPI), 0) /
+                            percentageKPIs.filter(item => item['Nhóm tiêu chí'] === group).length
+                    }))
+                }]
+            });
+
+            // KPI by Level Chart - chỉ hiển thị cho KPI dạng %
+            Highcharts.chart('kpiByLevelChart', {
+                chart: { type: 'pie' },
+                title: { text: 'Phân bố KPI theo bậc (%)' },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                        }
+                    }
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                },
+                series: [{
+                    name: 'KPI',
+                    data: [...new Set(percentageKPIs.map(item => item.Bậc))].map(level => ({
+                        name: level,
+                        y: percentageKPIs.filter(item => item.Bậc === level)
+                            .reduce((sum, item) => sum + parseFloat(item.KPI), 0) /
+                            percentageKPIs.filter(item => item.Bậc === level).length
+                    }))
+                }]
+            });
+        }
+
+        function updateTable(data, page = 1) {
+            const startIndex = (page - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedData = data.slice(startIndex, endIndex);
+
+            const tableBody = document.getElementById('kpiTableBody');
+            tableBody.innerHTML = paginatedData.map(item => {
+                // Xác định màu sắc dựa trên giá trị KPI và ĐVT
+                const getKPIColor = (kpi, dvt) => {
+                    if (dvt === '%') {
+                        return parseFloat(kpi) >= 80 ? 'text-green-600' :
+                            parseFloat(kpi) >= 50 ? 'text-yellow-600' : 'text-red-600';
+                    }
+                    return 'text-gray-600';
+                };
+
+                const getProgressBar = (kpi, dvt) => {
+                    if (dvt === '%') {
+                        return `
+                    <div class="w-20 bg-gray-200 rounded-full h-2">
+                        <div class="h-2 rounded-full ${parseFloat(kpi) >= 80 ? 'bg-green-600' :
+                                parseFloat(kpi) >= 50 ? 'bg-yellow-600' : 'bg-red-600'
+                            }" style="width: ${kpi}%"></div>
+                    </div>
+                `;
+                    }
+                    return '';
+                };
+
+                const getTSColor = (ts) => {
+                    return parseFloat(ts) >= 0.8 ? 'text-green-600' :
+                        parseFloat(ts) >= 0.5 ? 'text-yellow-600' : 'text-red-600';
+                };
+
+                const formatTS = (ts) => {
+                    const tsformat = (parseFloat(ts) * 100).toFixed(0);
+                    return tsformat;
+                };
+
+                return `
+            <tr class="hover:bg-gray-50 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item['Tên tiêu chí']}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.Bậc}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <div class="flex items-center">
+                        <span class="mr-2 ${getTSColor(item['Trọng số'])}">
+                            ${formatTS(item['Trọng số'])}%
+                        </span>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <div class="flex items-center">
+                        <span class="mr-2 ${getKPIColor(item.KPI, item.ĐVT)}">
+                            ${item.KPI}
+                        </span>
+                        ${getProgressBar(item.KPI, item.ĐVT)}
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.ĐVT}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${parseFloat(item['Thưởng tiêu chuẩn']).toLocaleString()} ₫</td>
+            </tr>
+        `;
+            }).join('');
+
+            updatePagination(data.length, page);
+            updateTableInfo(startIndex + 1, Math.min(endIndex, data.length), data.length);
+        }
+        function updatePagination(totalItems, currentPage) {
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const pagination = document.getElementById('pagination');
+            const prevButton = document.getElementById('prevPage');
+            const nextButton = document.getElementById('nextPage');
+
+            // Enable/disable prev/next buttons
+            prevButton.disabled = currentPage === 1;
+            prevButton.classList.toggle('opacity-50', currentPage === 1);
+            nextButton.disabled = currentPage === totalPages;
+            nextButton.classList.toggle('opacity-50', currentPage === totalPages);
+
+            // Generate pagination numbers
+            let paginationHTML = '';
+            for (let i = 1; i <= totalPages; i++) {
+                if (
+                    i === 1 || // First page
+                    i === totalPages || // Last page
+                    (i >= currentPage - 2 && i <= currentPage + 2) // Pages around current
+                ) {
+                    paginationHTML += `
+                        <button class="px-4 py-2 border rounded-lg ${i === currentPage
+                            ? 'bg-blue-600 text-white'
+                            : 'hover:bg-gray-100'}" 
+                            onclick="goToPage(${i})">${i}</button>
+                    `;
+                } else if (
+                    i === currentPage - 3 ||
+                    i === currentPage + 3
+                ) {
+                    paginationHTML += '<span class="px-4 py-2">...</span>';
+                }
+            }
+            pagination.innerHTML = paginationHTML;
+        }
+
+        function updateTableInfo(start, end, total) {
+            document.getElementById('currentEntries').textContent = `${start}-${end}`;
+            document.getElementById('totalEntries').textContent = total;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            const filteredData = filterData(originalData);
+            updateTable(filteredData, page);
+        }
+
+        function initializeFilters(data) {
+            const bacFilter = document.getElementById('filterBac');
+            const nhomFilter = document.getElementById('filterNhomTieuChi');
+            const positionFilter = document.getElementById('filterPosition');
+
+            // Get unique values
+            const bacs = [...new Set(data.map(item => item.Bậc))];
+            const nhoms = [...new Set(data.map(item => item['Nhóm tiêu chí']))];
+            const positions = [...new Set(data.map(item => item['Mã vị trí']))];
+
+            // Sort bacs numerically
+            bacs.sort((a, b) => {
+                const aNum = parseInt(a.replace('Bậc ', ''));
+                const bNum = parseInt(b.replace('Bậc ', ''));
+                return aNum - bNum;
+            });
+
+            // Sort other arrays alphabetically
+            nhoms.sort();
+            positions.sort();
+
+            // Populate filters
+            bacs.forEach(bac => {
+                const option = new Option(bac, bac);
+                bacFilter.add(option);
+            });
+
+            nhoms.forEach(nhom => {
+                const option = new Option(nhom, nhom);
+                nhomFilter.add(option);
+            });
+
+            positions.forEach(position => {
+                const option = new Option(position, position);
+                positionFilter.add(option);
+            });
+
+            // Add event listeners
+            [bacFilter, nhomFilter, positionFilter].forEach(filter => {
+                filter.addEventListener('change', () => {
+                    currentPage = 1;
+                    const filteredData = filterData(originalData);
+                    const sortedData = sortData(filteredData); // Sort after filtering
+                    updateDashboard(sortedData);
+                    updateTable(sortedData, 1);
+                });
+            });
+        }
+
+        function filterData(data) {
+            const bacValue = document.getElementById('filterBac').value;
+            const nhomValue = document.getElementById('filterNhomTieuChi').value;
+            const positionValue = document.getElementById('filterPosition').value;
+            const searchValue = document.getElementById('searchTable').value.toLowerCase();
+
+            return data.filter(item => {
+                const matchBac = !bacValue || item.Bậc === bacValue;
+                const matchNhom = !nhomValue || item['Nhóm tiêu chí'] === nhomValue;
+                const matchPosition = !positionValue || item['Mã vị trí'] === positionValue;
+                const matchSearch = !searchValue ||
+                    item['Tên tiêu chí'].toLowerCase().includes(searchValue) ||
+                    item.Bậc.toLowerCase().includes(searchValue) ||
+                    item['Nhóm tiêu chí'].toLowerCase().includes(searchValue) ||
+                    item['Mã vị trí'].toLowerCase().includes(searchValue);
+
+                return matchBac && matchNhom && matchPosition && matchSearch;
+            });
+        }
+
+        function initializeSearch() {
+            const searchInput = document.getElementById('searchTable');
+            let searchTimeout;
+
+            searchInput.addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    currentPage = 1;
+                    const filteredData = filterData(originalData);
+                    updateDashboard(filteredData);
+                    updateTable(filteredData, 1);
+                }, 300);
+            });
+        }
+
+        function initializeSorting() {
+            const headers = document.querySelectorAll('th');
+
+            // Cập nhật mũi tên chỉ thị ban đầu cho cột Bậc
+            headers.forEach(header => {
+                if (header.textContent.trim().replace(' ▼', '') === 'Bậc') {
+                    header.textContent = 'Bậc ▼';
+                }
+            });
+
+            headers.forEach(header => {
+                header.addEventListener('click', () => {
+                    const column = header.textContent.trim().replace(' ▼', '');
+                    if (sortColumn === column) {
+                        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        sortColumn = column;
+                        sortDirection = 'asc';
+                    }
+
+                    // Update header arrows
+                    headers.forEach(h => h.textContent = h.textContent.replace(' ▼', ''));
+                    header.textContent = `${column} ▼`;
+
+                    const filteredData = filterData(originalData);
+                    const sortedData = sortData(filteredData);
+                    updateTable(sortedData, currentPage);
+                });
+            });
+        }
+
+        function sortData(data) {
+            const sortedData = [...data];
+            sortedData.sort((a, b) => {
+                let aValue = a[sortColumn];
+                let bValue = b[sortColumn];
+
+                // Xử lý đặc biệt cho cột Bậc
+                if (sortColumn === 'Bậc') {
+                    // Tách số từ chuỗi "Bậc X"
+                    const aNum = parseInt(aValue.replace('Bậc ', ''));
+                    const bNum = parseInt(bValue.replace('Bậc ', ''));
+
+                    if (sortDirection === 'asc') {
+                        return aNum - bNum;
+                    } else {
+                        return bNum - aNum;
+                    }
+                }
+
+                // Xử lý cho các cột khác
+                // Convert to numbers if possible
+                if (!isNaN(aValue)) aValue = parseFloat(aValue);
+                if (!isNaN(bValue)) bValue = parseFloat(bValue);
+
+                if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+                if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+            return sortedData;
+        }
+
+        async function updateDashboard(data) {
+            // Sắp xếp data theo Bậc trước khi cập nhật
+            const sortedData = sortData(data);
+
+            // Lọc ra các chỉ tiêu có ĐVT là %
+            const percentageKPIs = sortedData.filter(item => item.ĐVT === '%');
+
+            // Calculate summary statistics
+            const totalCriteria = sortedData.length;
+            const averageKPI = percentageKPIs.length > 0
+                ? percentageKPIs.reduce((sum, item) => sum + parseFloat(item.KPI), 0) / percentageKPIs.length
+                : 0;
+
+            // Tính tổng thưởng tiêu chuẩn
+            const totalStandardReward = sortedData.reduce((sum, item) =>
+                sum + parseFloat(item['Thưởng tiêu chuẩn'] || 0), 0);
+
+            // Tính tổng thưởng AP (cho các tiêu chí thuộc nhóm AP)
+            const totalAPReward = sortedData
+                .filter(item => item['Nhóm tiêu chí'] === 'AP')
+                .reduce((sum, item) => sum + parseFloat(item['Thưởng tiêu chuẩn'] || 0), 0);
+
+            // Tính tổng thưởng QU (cho các tiêu chí thuộc nhóm QU)
+            const totalQUReward = sortedData
+                .filter(item => item['Nhóm tiêu chí'] === 'QU')
+                .reduce((sum, item) => sum + parseFloat(item['Thưởng tiêu chuẩn'] || 0), 0);
+
+            // Update summary cards with animations
+            animateNumber('totalCriteria', totalCriteria);
+            animateNumber('averageKPI', averageKPI, '%');
+            animateNumber('totalStandardReward', totalStandardReward, ' ₫');
+            animateNumber('totalAPReward', totalAPReward, ' ₫');
+            animateNumber('totalQUReward', totalQUReward, ' ₫');
+
+            // Update KPI progress bar
+            const progressBar = document.getElementById('kpiProgress');
+            progressBar.style.width = `${averageKPI}%`;
+
+            // Update charts with sorted data
+            updateCharts(sortedData);
+
+            // Update table with sorted data
+            updateTable(sortedData, currentPage);
+        }
+
+        function animateNumber(elementId, finalValue, suffix = '') {
+            const element = document.getElementById(elementId);
+            const startValue = parseFloat(element.textContent);
+            const duration = 1000; // Animation duration in milliseconds
+            const steps = 60; // Number of steps in animation
+            const stepValue = (finalValue - startValue) / steps;
+            let currentStep = 0;
+
+            const animation = setInterval(() => {
+                currentStep++;
+                const currentValue = startValue + (stepValue * currentStep);
+                element.textContent = currentValue.toLocaleString('vi-VN', {
+                    maximumFractionDigits: 1
+                }) + suffix;
+
+                if (currentStep >= steps) {
+                    clearInterval(animation);
+                    element.textContent = finalValue.toLocaleString('vi-VN', {
+                        maximumFractionDigits: 1
+                    }) + suffix;
+                }
+            }, duration / steps);
+        }
+
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', async function () {
+            try {
+                showLoading();
+
+                document.getElementById('loadingSpinner').style.display = 'flex';
+
+                const data = await fetchDataFromAppSheet('KPI_KNL CT', '');
+                if (data) {
+                    originalData = data;
+
+                    // Sort data by Bậc initially
+                    const sortedData = sortData(data);
+
+                    // Initialize all components
+                    initializeFilters(sortedData);
+                    initializeSearch();
+                    initializeSorting();
+
+                    // Update dashboard with sorted data
+                    updateDashboard(sortedData);
+                    updateTable(sortedData, 1);
+
+                    initializeEnhancements();
+
+                    // Cập nhật event listeners cho nút Previous/Next
+                    document.getElementById('prevPage').addEventListener('click', () => {
+                        if (currentPage > 1) {
+                            currentPage--;
+                            const filteredData = filterData(originalData);
+                            const sortedData = sortData(filteredData);
+                            updateTable(sortedData, currentPage);
+                        }
+                    });
+
+                    document.getElementById('nextPage').addEventListener('click', () => {
+                        const filteredData = filterData(originalData);
+                        const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+                        if (currentPage < totalPages) {
+                            currentPage++;
+                            const sortedData = sortData(filteredData);
+                            updateTable(sortedData, currentPage);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error initializing dashboard:', error);
+                document.getElementById('errorMessage').innerHTML = `
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <strong class="font-bold">Lỗi!</strong>
+                <span class="block sm:inline">Không thể tải dữ liệu. Vui lòng thử lại sau.</span>
+            </div>`;
+            } finally {
+                document.getElementById('loadingSpinner').style.display = 'none';
+                hideLoading();
+            }
+        });
+
+        function goToPage(page) {
+            currentPage = page;
+            const filteredData = filterData(originalData);
+            // Thêm sắp xếp dữ liệu trước khi cập nhật bảng
+            const sortedData = sortData(filteredData);
+            updateTable(sortedData, page);
+        }
+
+
+    </script>
+</body>
+
+</html>
