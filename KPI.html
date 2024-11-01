@@ -5,12 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Báo Cáo KPI</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/lelinh014756/fui-toast-js@master/assets/css/toast@1.0.1/fuiToast.min.css">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/11.3.0/highcharts.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/11.3.0/modules/exporting.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/11.3.0/modules/export-data.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/11.3.0/modules/accessibility.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/lelinh014756/fui-toast-js@master/assets/js/toast@1.0.1/fuiToast.min.js"></script>
 
     <style>
         .filter-group {
@@ -60,6 +63,7 @@
 
 
 <body class="bg-gray-100">
+    <div id="fui-toast"></div>
     <!-- Loading Spinner -->
     <div id="loadingSpinner" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="animate-spin rounded-full h-32 w-32 border-b-2 border-white"></div>
@@ -410,7 +414,8 @@
             const filters = document.querySelectorAll('select');
             filters.forEach(filter => {
                 filter.addEventListener('change', () => {
-                    showToast(`Đã lọc theo ${filter.options[filter.selectedIndex].text}`, 'info');
+                    FuiToast.success(`Đã lọc theo ${filter.options[filter.selectedIndex].text}`);
+                    // showToast(`Đã lọc theo ${filter.options[filter.selectedIndex].text}`, 'info');
                 });
             });
 
