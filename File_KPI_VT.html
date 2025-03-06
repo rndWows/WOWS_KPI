@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KPI</title>
+    <link rel="shortcut icon" href="https://rndwows.github.io/WOWS_KPI/WOWS-GROUP-logo.png" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+                background: white;
+            }
+
+            .a4-page {
+                box-shadow: none !important;
+                margin: 0;
+                padding: 0;
+            }
+
+            .print\:hidden {
+                display: none !important;
+            }
+        }
+
+        .a4-page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 5mm;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
+        }
+
+        @media screen {
+            body {
+                background: rgb(204, 204, 204);
+            }
+
+            .a4-page {
+                margin: 2cm auto;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <!-- Add print button -->
+    <div class="fixed top-4 right-4 print:hidden">
+
+        <button onclick="window.print()"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 transition-colors mb-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            In tài liệu
+        </button>
+    </div>
+    <div class="a4-page">
+        <div id="A4Page">
+            <div class="flex justify-between items-start">
+                <div class="flex items-center">
+                    <img src="https://rndwows.github.io/WOWS_KPI/logowows.jpg" alt="WOWS Group Logo"
+                        style="width: 50mm; height: 50mm;">
+                </div>
+                <!-- <div class="text-right">
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div class="text-right mt-6">Mã văn bản:</div>
+                        <div></div>
+                        <div class="text-right">Ngày cập nhật:</div>
+                        <div></div>
+                        <div class="text-right">Lần sửa đổi:</div>
+                        <div></div>
+                        <div class="text-right">Số trang:</div>
+                        <div id="pageCount"></div>
+                    </div>
+                </div> -->
+            </div>
+
+            <div class="text-center font-bold text-xl mb-4">
+                <h1>CÔNG TY CỔ PHẦN TẬP ĐOÀN WOWS</h1>
+                <h3 class="mt-2">BẢNG MỤC TIÊU CÔNG VIỆC - KPI- THEO VỊ TRÍ</h3>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p><span class="font-semibold">Kỳ áp dụng:</span> <span id="Kyapdung"></span> </p>
+                    <p class="mt-2"><span class="font-semibold">Phòng ban:</span> <span id="Phongban"></span></p>
+                </div>
+                <div>
+                    <p><span class="font-semibold">Vị trí:</span> <span id="Vitri"> </span></p>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <table class="w-full border-collapse border border-gray-300">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="border border-gray-300 px-2 py-1 text-sm">STT</th>
+                            <th class="border border-gray-300 px-2 py-1 text-sm">Bậc</th>
+                            <th class="border border-gray-300 px-2 py-1 text-sm">Nhóm tiêu chí</th>
+                            <th class="border border-gray-300 px-2 py-1 text-sm">Tên tiêu chí</th>
+                            <th class="border border-gray-300 px-2 py-1 text-sm">Mô tả chi tiết</th>
+                            <th class="border border-gray-300 px-2 py-1 text-sm">Trọng số</th>
+                            <th class="border border-gray-300 px-2 py-1 text-sm">Đơn vị tính</th>
+                            <th class="border border-gray-300 px-2 py-1 text-sm">KPI</th>
+                            <th class="border border-gray-300 px-2 py-1 text-sm">Đơn giá tiêu chuẩn</th>
+                            <th class="border border-gray-300 px-2 py-1 text-sm">Thành tiền tiêu chuẩn</th>
+                        </tr>
+                    </thead>
+                    <tbody id="kpiTableBody">
+                        <!-- Table data will be loaded here dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-8 grid grid-cols-3 gap-4 text-center">
+                <div>
+                    <p class="font-bold"> </p>
+                    <p class="italic">Xét duyệt</p>
+                    <div class="h-20"></div>
+                </div>
+                <div>
+                    <p class="font-bold"> </p>
+                    <p class="italic">Trưởng ban kiểm tra</p>
+                    <div class="h-20"></div>
+                </div>
+                <div>
+                    <p class="">Ngày ... Tháng ... Năm ...</p>
+                    <p class="italic">Người lập</p>
+                    <div class="h-20"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const APP_ID = 'e6017786-8311-4f98-9160-0ffa00686169';
+        const API_KEY = 'V2-XsBEC-P7YR6-LBK2m-dYhVj-9SVNm-FUoLC-6HLgb-RP2Za';
+
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        function showLoading() {
+            document.getElementById('A4Page').innerHTML = `
+                <div class="flex flex-col justify-center items-center h-96">
+                    <div class="relative">
+                        <div class="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                        <div class="absolute top-0 left-0 w-16 h-16 border-4 border-transparent border-r-red-400 rounded-full animate-spin"
+                            style="animation-duration: 1.5s;"></div>
+                    </div>
+                    
+                    <!-- Thông báo loading -->
+                    <div class="mt-6 text-center">
+                        <p class="text-lg font-semibold text-gray-700">Đang tải dữ liệu...</p>
+                        <p class="text-sm text-gray-500 mt-2">Hệ thống đang chuẩn bị thông tin</p>
+                    </div>
+                    
+                    <!-- Thanh tiến trình -->
+                    <div class="w-64 h-2 bg-gray-200 rounded-full mt-6 overflow-hidden">
+                        <div class="h-full bg-blue-600 rounded-full animate-pulse"
+                            style="animation-duration: 1.5s; width: 100%;"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function hideLoading() {
+            const loadingElement = document.querySelector('#jobDescription .flex.justify-center.items-center');
+            if (loadingElement) {
+                loadingElement.remove();
+            }
+        }
+
+        window.onload = async () => {
+            try {
+                const ID = getUrlParameter('ID');
+                const kpi = await fetchKPI_KNL(ID);
+                if (kpi) {
+                    renderKPI_KNL(kpi);
+                }
+                const kpiData = await fetchKPI(ID);
+                if (kpiData) {
+                    renderKPI(kpiData);
+                    countPages();
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        };
+
+
+        async function countPages() {
+            // Get the content area height
+            const contentElement = document.getElementById('A4Page');
+            const contentHeight = contentElement.offsetHeight;
+
+            // Get the page height (A4 page height in pixels minus margins)
+            // A4 is 297mm tall, and we're using 5mm padding on each side
+            const pageHeight = 287 * 3.78; // Approximate conversion from mm to pixels
+
+            // Calculate number of pages
+            const pageCount = Math.ceil(contentHeight / pageHeight);
+
+            // Update the page count in the document
+            const pageCountElements = document.querySelectorAll('.page-count');
+            pageCountElements.forEach(element => {
+                element.textContent = pageCount;
+            });
+
+            document.getElementById('pageCount').textContent = pageCount;
+            // return pageCount;
+        }
+
+        async function fecthTable(table, Selector) {
+            try {
+                const response = await fetch(`https://api.appsheet.com/api/v2/apps/${APP_ID}/tables/${table}/Action`, {
+                    method: 'POST',
+                    headers: {
+                        'applicationAccessKey': API_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "Action": "Find",
+                        "Properties": {
+                            "Selector": Selector
+                        }
+                    })
+                });
+
+                const tasksData = await response.json();
+                return tasksData;
+            } catch (error) {
+                console.error('Error fetching tasks:', error);
+                return null;
+            }
+        }
+
+        async function fetchKPI(ID) {
+            const table = "KPI_KNL CT";
+            const Selector = `Filter(${table}, [ID_KPI_KNL] = '${ID}')`;
+            return fecthTable(table, Selector);
+        }
+
+        async function fetchKPI_KNL(ID) {
+            const table = "KPI_KNL";
+            const Selector = `Filter(${table}, [ID_KPI_KNL] = '${ID}')`;
+            return fecthTable(table, Selector);
+            
+        }
+
+        function renderKPI(tasks) {
+            const tableBody = document.getElementById('kpiTableBody');
+            const formatCurrency = (value) => {
+                if (!value && value !== 0) return '';
+                return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            };
+            if (!tableBody) return;
+
+            const tasksHTML = tasks.map((task, index) => `
+                 <tr>
+                    <td class="border border-gray-300 px-2 py-1 text-center">${index + 1}</td>
+                    <td class="border border-gray-300 px-2 py-1 text-center">${task['Bậc_Number'] || ''}</td>
+                    <td class="border border-gray-300 px-2 py-1 text-center">${task['Nhóm tiêu chí'] || ''}</td>
+                    <td class="border border-gray-300 px-2 py-1">${task['Tên tiêu chí'] || ''}</td>
+                    <td class="border border-gray-300 px-2 py-1">${task['Chi tiết'] || ''}</td>
+                    <td class="border border-gray-300 px-2 py-1 text-center">${task['Trọng số'] * 100 + '%' || ''}</td>
+                    <td class="border border-gray-300 px-2 py-1 text-center">${task['ĐVT'] || ''}</td>
+                    <td class="border border-gray-300 px-2 py-1 text-right">${formatCurrency(task['KPI']) || ''}</td>
+                    <td class="border border-gray-300 px-2 py-1 text-right">${formatCurrency(task['Giá tiêu chuẩn']) || ''}</td>
+                    <td class="border border-gray-300 px-2 py-1 text-right">${formatCurrency(task['Thưởng tiêu chuẩn']) || ''}</td>
+                </tr>
+            `).join('');
+
+            tableBody.innerHTML = tasksHTML;
+        }
+
+        function renderKPI_KNL(kpi) {
+            document.getElementById('Kyapdung').textContent = kpi[0]['Kỳ áp dụng'];
+            document.getElementById('Vitri').textContent = kpi[0]['Vị trí'];
+            document.getElementById('Phongban').textContent = kpi[0]['Phòng ban'];
+        }
+    </script>
+</body>
+
+</html>
