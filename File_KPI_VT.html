@@ -278,7 +278,7 @@
                     <td class="border border-gray-300 px-2 py-1 text-center">${task['Nhóm tiêu chí'] || ''}</td>
                     <td class="border border-gray-300 px-2 py-1">${task['Tên tiêu chí'] || ''}</td>
                     <td class="border border-gray-300 px-2 py-1">${task['Chi tiết'] || ''}</td>
-                    <td class="border border-gray-300 px-2 py-1 text-center">${task['Trọng số'] * 100 + '%' || ''}</td>
+                    <td class="border border-gray-300 px-2 py-1 text-center">${task['Trọng số'] ? (task['Trọng số']*100).toFixed(0) + '%' : ''}</td>
                     <td class="border border-gray-300 px-2 py-1 text-center">${task['ĐVT'] || ''}</td>
                     <td class="border border-gray-300 px-2 py-1 text-right">${formatCurrency(task['KPI']) || ''}</td>
                     <td class="border border-gray-300 px-2 py-1 text-right">${formatCurrency(task['Giá tiêu chuẩn']) || ''}</td>
