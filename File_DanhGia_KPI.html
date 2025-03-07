@@ -110,12 +110,13 @@
             </div>
             <div class="grid grid-cols-2 gap-4 mt-2">
                 <div>
-                    <p><span class="font-semibold">Tiền KPI tiêu chuẩn:</span> <span id="TienKPIchuan"> </span></p>
-                    <p class="mt-2"><span class="font-semibold">Người đánh giá:</span> <span
-                            id="Nguoidanhgia"></span></p>
+                    <p><span class="font-semibold">Thưởng AP tiêu chuẩn:</span> <span id="TienAPchuan"> </span></p>
+                    <p class="mt-2"><span class="font-semibold">Tiền KPI tiêu chuẩn:</span> <span id="TienKPIchuan"> </span></p>
+                    <p class="mt-2"><span class="font-semibold">Người đánh giá:</span> <span id="Nguoidanhgia"></span></p>
                 </div>
                 <div>
-                    <p><span class="font-semibold">Tiền KPI đạt được:</span> <span id="TienKPIduoc"> </span></p>
+                    <p><span class="font-semibold">Thưởng QR tiêu chuẩn:</span> <span id="TienQRduoc"> </span></p>
+                    <p class="mt-2"><span class="font-semibold">Tiền KPI đạt được:</span> <span id="TienKPIduoc"> </span></p>
                     <p class="mt-2"><span class="font-semibold">Ngày đánh giá:</span> <span id="Ngaydanhgia"></span>
                     </p>
                 </div>
@@ -322,6 +323,8 @@
             document.getElementById('Nguoidanhgia').textContent = task[0]['Người đánh giá'];
             document.getElementById('TienKPIduoc').textContent = formatPrice(task[0]['Thành tiền KPI']);
             document.getElementById('Ngaydanhgia').textContent = task[0]['Ngày đánh giá'];
+            document.getElementById('TienAPchuan').textContent = formatPrice(task[0]['Mức AP tiêu chuẩn']);
+            document.getElementById('TienQRduoc').textContent = formatPrice(task[0]['Mức QU tiêu chuẩn']);   
         }
 
         function renderChamKPICT(tasks) {
