@@ -94,13 +94,24 @@
                 <h3 class="mt-2">BẢNG MỤC TIÊU CÔNG VIỆC - KPI- THEO VỊ TRÍ</h3>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-3 gap-4">
                 <div>
                     <p><span class="font-semibold">Kỳ áp dụng:</span> <span id="Kyapdung"></span> </p>
-                    <p class="mt-2"><span class="font-semibold">Phòng ban:</span> <span id="Phongban"></span></p>
+                </div>
+                <div>
+                    <p><span class="font-semibold">Phòng ban:</span> <span id="Phongban"></span></p>
                 </div>
                 <div>
                     <p><span class="font-semibold">Vị trí:</span> <span id="Vitri"> </span></p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mt-2">
+                <div>
+                    <p><span class="font-semibold">Thưởng AP tiêu chuẩn:</span> <span id="AP"></span></p>
+                </div>
+                <div>
+                    <p><span class="font-semibold">Thưởng QR tiêu chuẩn:</span> <span id="QR"></span></p>
                 </div>
             </div>
 
@@ -294,10 +305,16 @@
             tableBody.innerHTML = tasksHTML;
         }
 
+        function formatPrice(price) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+        }
+
         function renderKPI_KNL(kpi) {
             document.getElementById('Kyapdung').textContent = kpi[0]['Kỳ áp dụng'];
             document.getElementById('Vitri').textContent = kpi[0]['Vị trí'];
             document.getElementById('Phongban').textContent = kpi[0]['Phòng ban'];
+            document.getElementById('AP').textContent = formatPrice(kpi[0]['Thưởng AP tiêu chuẩn']);
+            document.getElementById('QR').textContent = formatPrice(kpi[0]['Thưởng QU tiêu chuẩn']);
         }
 
         function addStyles() {
