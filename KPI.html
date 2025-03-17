@@ -360,7 +360,7 @@
                 </div>
                 <div
                     class="bg-white rounded-lg shadow p-4 sm:p-6 transform hover:scale-105 transition-transform duration-200">
-                    <h3 class="text-base sm:text-lg font-semibold text-gray-700 mb-2">Tổng thưởng QU</h3>
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-700 mb-2">Tổng thưởng QR</h3>
                     <p class="text-2xl sm:text-3xl font-bold text-pink-600" id="totalQUReward">0 ₫</p>
                 </div>
             </div>
@@ -991,8 +991,8 @@
                 .reduce((sum, item) => sum + parseFloat(item['Thưởng tiêu chuẩn'] || 0), 0);
 
             // Tính tổng thưởng QU (cho các tiêu chí thuộc nhóm QU)
-            const totalQUReward = sortedData
-                .filter(item => item['Nhóm tiêu chí'] === 'QU')
+            const totalQUReward = sortedData    
+                .filter(item => item['Nhóm tiêu chí'] === 'QR')
                 .reduce((sum, item) => sum + parseFloat(item['Thưởng tiêu chuẩn'] || 0), 0);
 
             // Update summary cards with animations
