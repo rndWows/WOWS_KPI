@@ -715,50 +715,51 @@
                         // Reset select element
                         const phuCapElement = document.getElementById('phuCap');
 
-                        // Đặt selected cho từng option dựa trên dữ liệu bản nháp
-                        // Đầu tiên bỏ chọn tất cả
-                        Array.from(phuCapElement.options).forEach(option => {
-                            option.selected = false;
-                        });
+                        // Lưu lại tất cả các phụ cấp có sẵn
+                        const allPhuCap = Array.from(phuCapElement.options).map(option => ({
+                            value: option.value,
+                            label: option.textContent,
+                            selected: selectedDraft.formData.phuCap.includes(option.value)
+                        }));
 
-                        // Sau đó chọn các options theo dữ liệu bản nháp
-                        selectedDraft.formData.phuCap.forEach(phuCapValue => {
-                            Array.from(phuCapElement.options).forEach(option => {
-                                if (option.value === phuCapValue) {
-                                    option.selected = true;
-                                }
-                            });
-                        });
-
-                        const choices = new Choices(phuCapSelect, {
+                        // Khởi tạo Choices.js với tùy chọn để tự động ẩn các lựa chọn đã chọn
+                        const choices = new Choices(phuCapElement, {
                             removeItemButton: true,
                             maxItemCount: -1,
                             searchEnabled: true,
                             placeholder: true,
-                            placeholderValue: 'Chọn phụ cấp...'
+                            placeholderValue: 'Chọn phụ cấp...',
+                            hideSelected: true, // Ẩn các options đã được chọn
+                            itemSelectText: '', // Ẩn văn bản "Nhấn để chọn"
                         });
 
-                        // Store the instance globally for access from other functions
+                        // Đặt lại các giá trị cho Choices
+                        choices.setChoices(allPhuCap, 'value', 'label', true);
+
+                        // Chọn các giá trị từ dữ liệu bản nháp
+                        // choices.setValue(selectedDraft.formData.phuCap);
+
+                        // Lưu instance vào biến toàn cục
                         window.phuCapChoices = choices;
 
-
-                        // Log để debug
-                        console.log("Đã tải giá trị phụ cấp:", selectedDraft.formData.phuCap);
                     } catch (error) {
                         console.error("Error setting up phụ cấp choices:", error);
 
-                        // Fallback handling - at least try to set the values directly
+                        // Fallback handling
                         setTimeout(() => {
                             try {
                                 const phuCapElement = document.getElementById('phuCap');
 
-                                // Try to reinitialize Choices.js
+                                // Thử tạo lại Choices.js với tùy chọn ẩn các lựa chọn đã chọn
                                 if (!window.phuCapChoices) {
                                     window.phuCapChoices = new Choices(phuCapElement, {
                                         removeItemButton: true,
                                         maxItemCount: -1,
                                         searchEnabled: true,
-                                        placeholder: true
+                                        placeholder: true,
+                                        placeholderValue: 'Chọn phụ cấp...',
+                                        hideSelected: true, // Ẩn các options đã được chọn
+                                        itemSelectText: '' // Ẩn văn bản "Nhấn để chọn"
                                     });
                                 }
 
@@ -1413,7 +1414,7 @@
                     return;
                 }
 
-                console.log('Dữ liệu CaiDatPB đã tải:', CaiDatPB);
+                // console.log('Dữ liệu CaiDatPB đã tải:', CaiDatPB);
 
                 // Kiểm tra xem có dữ liệu không
                 if (CaiDatPC.length === 0) {
@@ -1874,24 +1875,6 @@
                 tongPhuCapElement.dataset.value = totalAllowance;
                 tongPhuCapElement.textContent = formatCurrency(totalAllowance);
             }
-
-            // Update the total income as well (BHXH + total allowance)
-            // const luongBHXHInput = document.getElementById(`luongBHXH_${level}`);
-            // const tongThuNhapElement = document.getElementById(`tongThuNhap_${level}`);
-
-            // if (luongBHXHInput && tongThuNhapElement) {
-            //     const luongBHXH = parseFloat(luongBHXHInput.value) || 0;
-            //     const totalIncome = luongBHXH + totalAllowance;
-
-            //     tongThuNhapElement.dataset.value = totalIncome;
-            //     tongThuNhapElement.textContent = formatCurrency(totalIncome);
-
-            //     // Update the corresponding item in chiTietList
-            //     const chiTietItem = chiTietList.find(item => item['Bậc'] === level);
-            //     if (chiTietItem) {
-            //         chiTietItem['Tổng thu nhập'] = totalIncome;
-            //     }
-            // }
         }
 
         // Hàm làm tròn số tiền lên hàng chục ngàn (5 chữ số)
