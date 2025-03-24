@@ -730,19 +730,6 @@
                             });
                         });
 
-                        // Tạo mới Choices instance với các tùy chọn để hiển thị các mục đã chọn
-                        // window.phuCapChoices = new Choices(phuCapElement, {
-                        //     removeItemButton: true,
-                        //     maxItemCount: -1,
-                        //     searchEnabled: true,
-                        //     placeholder: true,
-                        //     placeholderValue: 'Chọn phụ cấp...',
-                        //     shouldSort: false,
-                        //     renderSelectedChoices: 'always',
-                        //     itemSelectText: '',
-                        //     position: 'bottom'
-                        // });
-
                         const choices = new Choices(phuCapSelect, {
                             removeItemButton: true,
                             maxItemCount: -1,
@@ -1147,7 +1134,7 @@
         // Hàm cập nhật danh sách vị trí còn khả dụng
         // Hàm cập nhật danh sách vị trí còn khả dụng
         function updateAvailablePositions() {
-            console.log("Cập nhật danh sách vị trí khả dụng...");
+            // console.log("Cập nhật danh sách vị trí khả dụng...");
 
             // Xác định các vị trí đã được gán
             assignedPositions.clear();
@@ -1159,7 +1146,7 @@
                 }
             });
 
-            console.log("Các vị trí đã được gán:", Array.from(assignedPositions));
+            // console.log("Các vị trí đã được gán:", Array.from(assignedPositions));
 
             // Cập nhật tất cả các dropdown
             Object.keys(choicesInstances).forEach(selectId => {
@@ -1291,7 +1278,7 @@
                     }
                 });
 
-                console.log('Phản hồi API thô:', response.data);
+                // console.log('Phản hồi API thô:', response.data);
 
                 // Xử lý dữ liệu nhận được
                 if (response.data && response.data.Rows) {
@@ -1311,7 +1298,7 @@
                     return;
                 }
 
-                console.log('Dữ liệu CaiDatPB đã tải:', CaiDatPB);
+                // console.log('Dữ liệu CaiDatPB đã tải:', CaiDatPB);
 
                 // Kiểm tra xem có dữ liệu không
                 if (CaiDatPB.length === 0) {
@@ -1406,7 +1393,7 @@
                     }
                 });
 
-                console.log('Phản hồi API pc thô:', response.data);
+                // console.log('Phản hồi API pc thô:', response.data);
 
                 // Xử lý dữ liệu nhận được
                 if (response.data && response.data.Rows) {
@@ -1426,7 +1413,7 @@
                     return;
                 }
 
-                // console.log('Dữ liệu CaiDatPB đã tải:', CaiDatPB);
+                console.log('Dữ liệu CaiDatPB đã tải:', CaiDatPB);
 
                 // Kiểm tra xem có dữ liệu không
                 if (CaiDatPC.length === 0) {
@@ -1531,7 +1518,7 @@
                     }
                 });
 
-                console.log('Phản hồi API bhxh thô:', response.data);
+                // console.log('Phản hồi API bhxh thô:', response.data);
 
                 hideLoading();
 
@@ -1683,7 +1670,7 @@
             let bhxhData = [];
             try {
                 bhxhData = await loadCaiDatLuongBHYXH(viTriValue_data, ngayKhaiBao_data);
-                console.log("BHXH data loaded:", bhxhData);
+                // console.log("BHXH data loaded:", bhxhData);
             } catch (error) {
                 console.error("Error loading BHXH data:", error);
             }
@@ -1950,16 +1937,6 @@
 
                         // Store the instance globally for access from other functions
                         window.phuCapChoices = choices;
-                        // window.phuCapChoices = new Choices(phuCapSelect, {
-                        //     removeItemButton: true,
-                        //     maxItemCount: -1,
-                        //     searchEnabled: true,
-                        //     placeholder: true,
-                        //     placeholderValue: 'Chọn phụ cấp...',
-                        //     shouldSort: false,
-                        //     renderSelectedChoices: 'always',
-                        //     itemSelectText: ''
-                        // });
                     }, 100);
                 } catch (error) {
                     console.warn('Lỗi khi reset choices phụ cấp:', error);
@@ -2015,118 +1992,6 @@
                 document.getElementById('luongToiThieu').focus();
             }, 200);
         }
-
-
-        // Thay đổi sự kiện khi nhấn nút Làm mới
-        resetFormBtn.addEventListener('click', function () {
-            // Kiểm tra xem có dữ liệu gì đã được nhập chưa
-            const hasData = document.getElementById('luongToiThieu').value ||
-                document.getElementById('soBac').value ||
-                document.getElementById('chenhLechBac').value ||
-                document.getElementById('viTri').value !== '' ||
-                !chiTietSection.classList.contains('hidden');
-
-            if (hasData) {
-                // Nếu đã nhập dữ liệu, hiển thị hộp thoại xác nhận
-                Swal.fire({
-                    title: 'Xác nhận làm mới',
-                    text: 'Bạn có chắc muốn làm mới toàn bộ form? Dữ liệu hiện tại sẽ bị mất nếu chưa lưu.',
-                    icon: 'question',
-                    showDenyButton: true,
-                    showCancelButton: false,
-                    confirmButtonText: 'Làm mới',
-                    denyButtonText: 'Hủy',
-                    confirmButtonColor: '#0ea5e9',
-                    denyButtonColor: '#64748b'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Hỏi người dùng có muốn lưu dữ liệu hiện tại thành bản nháp không
-                        Swal.fire({
-                            title: 'Lưu bản nháp?',
-                            text: 'Bạn có muốn lưu dữ liệu hiện tại thành bản nháp không?',
-                            icon: 'question',
-                            showDenyButton: true,
-                            showCancelButton: false,
-                            confirmButtonText: 'Có, lưu bản nháp',
-                            denyButtonText: 'Không, làm mới luôn',
-                            confirmButtonColor: '#10b981',
-                            denyButtonColor: '#0ea5e9'
-                        }).then((saveResult) => {
-                            if (saveResult.isConfirmed) {
-                                // Lưu bản nháp trước khi làm mới
-                                saveAsDraft();
-                                setTimeout(() => {
-                                    resetForm();
-                                }, 500);
-                            } else if (saveResult.isDenied) {
-                                // Làm mới ngay mà không lưu
-                                resetForm();
-                            }
-
-                            // Hiển thị thông báo đã làm mới thành công
-                            const Toast = Swal.mixin({
-                                toast: true,
-                                position: 'top-end',
-                                showConfirmButton: false,
-                                timer: 2000,
-                                timerProgressBar: true
-                            });
-
-                            Toast.fire({
-                                icon: 'success',
-                                title: 'Đã làm mới form thành công!'
-                            });
-                        });
-                    }
-                });
-            } else {
-                // Nếu chưa có dữ liệu gì, làm mới luôn không cần hỏi
-                resetForm();
-
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 1500,
-                    timerProgressBar: true
-                });
-
-                Toast.fire({
-                    icon: 'success',
-                    title: 'Đã làm mới form thành công!'
-                });
-            }
-        });
-
-        // Sự kiện khi nhấn nút Làm mới
-        resetFormBtn.addEventListener('click', function () {
-            Swal.fire({
-                title: 'Xác nhận làm mới',
-                text: 'Bạn có chắc muốn làm mới toàn bộ form không?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#0ea5e9',
-                cancelButtonColor: '#64748b',
-                confirmButtonText: 'Đồng ý',
-                cancelButtonText: 'Hủy'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    resetForm();
-                    const Toast = Swal.mixin({
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 2000,
-                        timerProgressBar: true
-                    });
-
-                    Toast.fire({
-                        icon: 'success',
-                        title: 'Đã làm mới form thành công!'
-                    });
-                }
-            });
-        });
 
         // Sự kiện khi nhấn nút Hủy
         cancelBtn.addEventListener('click', function () {
@@ -2227,8 +2092,8 @@
                     }
                 });
 
-                console.log('Lưu bảng cha thành công:', responseKhaiBao.data);
-                console.log('Dữ liệu chi tiết:', chiTietList);
+                // console.log('Lưu bảng cha thành công:', responseKhaiBao.data);
+                // console.log('Dữ liệu chi tiết:', chiTietList);
 
                 // Bước 2: Lưu bảng con Khai bao luong CT
                 const responseChiTiet = await axios({
@@ -2248,8 +2113,8 @@
                     }
                 });
 
-                console.log('Lưu bảng con thành công:', responseChiTiet.data);
-                console.log('Dữ liệu phụ cấp:', phuCapList);
+                // console.log('Lưu bảng con thành công:', responseChiTiet.data);
+                // console.log('Dữ liệu phụ cấp:', phuCapList);
 
                 // Bước 3: Lưu bảng con Phu cap
                 const responsePhuCap = await axios({
@@ -2269,7 +2134,7 @@
                     }
                 });
 
-                console.log('Lưu bảng phụ cấp thành công:', responsePhuCap.data);
+                // console.log('Lưu bảng phụ cấp thành công:', responsePhuCap.data);
 
                 hideLoading();
 
@@ -2327,7 +2192,7 @@
 
             if (btnTaoChiTiet) {
                 btnTaoChiTiet.addEventListener('click', async function () {
-                    console.log("Tạo chi tiết button clicked");
+                    // console.log("Tạo chi tiết button clicked");
                     showLoading('Đang tạo bảng chi tiết...');
 
                     try {
@@ -2359,7 +2224,7 @@
 
                 // Gán sự kiện click mới
                 newResetBtn.addEventListener('click', function () {
-                    console.log('Nút làm mới đã được click!');
+                    // console.log('Nút làm mới đã được click!');
 
                     // Kiểm tra xem có dữ liệu gì đã được nhập chưa
                     const hasData = document.getElementById('luongToiThieu').value ||
