@@ -715,51 +715,81 @@
                         // Reset select element
                         const phuCapElement = document.getElementById('phuCap');
 
-                        // Lưu lại tất cả các phụ cấp có sẵn
+                        // Đặt selected cho từng option dựa trên dữ liệu bản nháp
+                        // Đầu tiên bỏ chọn tất cả
+                        Array.from(phuCapElement.options).forEach(option => {
+                            option.selected = false;
+                        });
+
+                        // Xóa tất cả các option hiện tại từ DOM
+                        while (phuCapElement.firstChild) {
+                            phuCapElement.removeChild(phuCapElement.firstChild);
+                        }
+
+                        // Tải lại tất cả các option từ dữ liệu CaiDatPC
+                        if (CaiDatPC && CaiDatPC.length > 0) {
+                            const phuCapList = [...new Set(CaiDatPC.map(item => item.NHOM || item['Tên phụ cấp']).filter(Boolean))];
+                            phuCapList.forEach(nhom => {
+                                const option = document.createElement('option');
+                                option.value = nhom;
+                                option.textContent = nhom;
+                                phuCapElement.appendChild(option);
+                            });
+                        } else {
+                            // Nếu không có dữ liệu CaiDatPC, tải lại từ API
+                            loadCaiDatPC().then(() => {
+                                // console.log('Dữ liệu phụ cấp đã được tải lại:', CaiDatPC);
+                            }).catch(error => {
+                                console.error('Không thể tải lại dữ liệu phụ cấp:', error);
+                            });
+                        }
+
+                        // Sau đó chọn các options theo dữ liệu bản nháp
+                        selectedDraft.formData.phuCap.forEach(phuCapValue => {
+                            Array.from(phuCapElement.options).forEach(option => {
+                                if (option.value === phuCapValue) {
+                                    option.selected = true;
+                                }
+                            });
+                        });
+
                         const allPhuCap = Array.from(phuCapElement.options).map(option => ({
                             value: option.value,
                             label: option.textContent,
                             selected: selectedDraft.formData.phuCap.includes(option.value)
                         }));
 
-                        // Khởi tạo Choices.js với tùy chọn để tự động ẩn các lựa chọn đã chọn
-                        const choices = new Choices(phuCapElement, {
+                        // Khởi tạo lại Choices.js với các tùy chọn hợp lệ
+                        const choices = new Choices(phuCapSelect, {
                             removeItemButton: true,
                             maxItemCount: -1,
                             searchEnabled: true,
                             placeholder: true,
                             placeholderValue: 'Chọn phụ cấp...',
-                            hideSelected: true, // Ẩn các options đã được chọn
-                            itemSelectText: '', // Ẩn văn bản "Nhấn để chọn"
+                            itemSelectText: ''
                         });
 
-                        // Đặt lại các giá trị cho Choices
                         choices.setChoices(allPhuCap, 'value', 'label', true);
 
-                        // Chọn các giá trị từ dữ liệu bản nháp
-                        // choices.setValue(selectedDraft.formData.phuCap);
-
-                        // Lưu instance vào biến toàn cục
+                        // Store the instance globally for access from other functions
                         window.phuCapChoices = choices;
 
                     } catch (error) {
                         console.error("Error setting up phụ cấp choices:", error);
 
-                        // Fallback handling
+                        // Fallback handling - at least try to set the values directly
                         setTimeout(() => {
                             try {
                                 const phuCapElement = document.getElementById('phuCap');
 
-                                // Thử tạo lại Choices.js với tùy chọn ẩn các lựa chọn đã chọn
+                                // Try to reinitialize Choices.js
                                 if (!window.phuCapChoices) {
                                     window.phuCapChoices = new Choices(phuCapElement, {
                                         removeItemButton: true,
                                         maxItemCount: -1,
                                         searchEnabled: true,
                                         placeholder: true,
-                                        placeholderValue: 'Chọn phụ cấp...',
-                                        hideSelected: true, // Ẩn các options đã được chọn
-                                        itemSelectText: '' // Ẩn văn bản "Nhấn để chọn"
+                                        placeholderValue: 'Chọn phụ cấp...'
                                     });
                                 }
 
@@ -801,6 +831,7 @@
 
             hideLoading();
         }
+
 
         // Function to load drafts from localStorage
         function loadDraftsFromStorage() {
@@ -1685,17 +1716,17 @@
             // Create header row with new "Tổng phụ cấp" column
             const headerRow = document.createElement('tr');
             headerRow.innerHTML = `
-        <th class="py-3 px-4 border-b border-gray-300 text-left bg-gradient-to-r from-blue-50 to-blue-100 font-medium text-gray-700 sticky top-0">LƯƠNG BẬC</th>
-        <th class="py-3 px-4 border-b border-gray-300 text-left bg-gradient-to-r from-blue-50 to-blue-100 font-medium text-gray-700 sticky top-0">TỔNG THU NHẬP</th>
-        <th class="py-3 px-4 border-b border-gray-300 text-left bg-gradient-to-r from-blue-50 to-blue-100 font-medium text-gray-700 sticky top-0">LƯƠNG BHXH</th>
-        <th class="py-3 px-4 border-b border-gray-300 text-left bg-gradient-to-r from-blue-50 to-blue-100 font-medium text-gray-700 sticky top-0">TỔNG PHỤ CẤP</th>
-    `;
+                <th class="py-3 px-4 border-b border-gray-300 text-left bg-gradient-to-r from-blue-50 to-blue-100 font-medium text-gray-700 sticky top-0">LƯƠNG BẬC</th>
+                <th class="py-3 px-4 border-b border-gray-300 text-left bg-gradient-to-r from-blue-50 to-blue-100 font-medium text-gray-700 sticky top-0">TỔNG THU NHẬP</th>
+                <th class="py-3 px-4 border-b border-gray-300 text-left bg-gradient-to-r from-blue-50 to-blue-100 font-medium text-gray-700 sticky top-0">LƯƠNG BHXH</th>
+                <th class="py-3 px-4 border-b border-gray-300 text-left bg-gradient-to-r from-blue-50 to-blue-100 font-medium text-gray-700 sticky top-0">TỔNG PHỤ CẤP</th>
+            `;
 
             // Add columns for each allowance type
             phuCap_data.forEach((pc, index) => {
                 headerRow.innerHTML += `
-            <th class="py-3 px-4 border-b border-gray-300 text-left bg-gradient-to-r from-blue-50 to-blue-100 font-medium text-gray-700 sticky top-0">${pc}</th>
-        `;
+                    <th class="py-3 px-4 border-b border-gray-300 text-left bg-gradient-to-r from-blue-50 to-blue-100 font-medium text-gray-700 sticky top-0">${pc}</th>
+                `;
             });
 
             chiTietTableHead.appendChild(headerRow);
@@ -1729,35 +1760,35 @@
 
                 // Display basic salary, total income, and add the new total allowance cell
                 row.innerHTML = `
-            <td class="py-3 px-4 border-b border-gray-200 text-gray-800 font-medium sticky left-0 bg-white">Bậc ${i}</td>
-            <td class="py-3 px-4 border-b border-gray-200 text-gray-800 font-medium text-primary-700 text-right">
-                <span id="tongThuNhap_${i}" data-value="${salaryData[i].total}">${formatCurrency(salaryData[i].total)}</span>
-            </td>
-            <td class="py-3 px-4 border-b border-gray-200">
-                <input type="number" id="luongBHXH_${i}" 
-                    class="custom-input w-full p-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:ring-1 focus:ring-primary-500" 
-                    value="${roundToTenThousand(luongBHXHValue)}"
-                    data-value="${roundToTenThousand(luongBHXHValue)}"
-                    placeholder="0"
-                    min="0" step="10000">
-            </td>
-            <td class="py-3 px-4 border-b border-gray-200 text-gray-800 font-medium text-green-600 text-right">
-                <span id="tongPhuCap_${i}" data-value="0">${formatCurrency(0)}</span>
-            </td>
-        `;
+                    <td class="py-3 px-4 border-b border-gray-200 text-gray-800 font-medium sticky left-0 bg-white">Bậc ${i}</td>
+                    <td class="py-3 px-4 border-b border-gray-200 text-gray-800 font-medium text-primary-700 text-right">
+                        <span id="tongThuNhap_${i}" data-value="${salaryData[i].total}">${formatCurrency(salaryData[i].total)}</span>
+                    </td>
+                    <td class="py-3 px-4 border-b border-gray-200">
+                        <input type="number" id="luongBHXH_${i}" 
+                            class="custom-input w-full p-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:ring-1 focus:ring-primary-500" 
+                            value="${roundToTenThousand(luongBHXHValue)}"
+                            data-value="${roundToTenThousand(luongBHXHValue)}"
+                            placeholder="0"
+                            min="0" step="10000">
+                    </td>
+                    <td class="py-3 px-4 border-b border-gray-200 text-gray-800 font-medium text-green-600 text-right">
+                        <span id="tongPhuCap_${i}" data-value="0">${formatCurrency(0)}</span>
+                    </td>
+                `;
 
                 // Add input cells for each allowance type
                 phuCap_data.forEach((pc, pcIndex) => {
                     row.innerHTML += `
-                <td class="py-3 px-4 border-b border-gray-200">
-                    <input type="number" id="phuCap_${i}_${pcIndex}" 
-                        class="custom-input w-full p-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:ring-1 focus:ring-primary-500" 
-                        value="" 
-                        placeholder="0"
-                        min="0" step="10000"
-                        onchange="calculateTotalAllowance(${i})">
-                </td>
-            `;
+                        <td class="py-3 px-4 border-b border-gray-200">
+                            <input type="number" id="phuCap_${i}_${pcIndex}" 
+                                class="custom-input w-full p-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:ring-1 focus:ring-primary-500" 
+                                value="" 
+                                placeholder="0"
+                                min="0" step="10000"
+                                onchange="calculateTotalAllowance(${i})">
+                        </td>
+                    `;
                 });
 
                 chiTietTableBody.appendChild(row);
@@ -1882,7 +1913,7 @@
             return Math.ceil(amount / 10000) * 10000;
         }
 
-        function resetForm() {
+        async function resetForm() {
             // Đặt lại ID khai báo mới
             document.getElementById('idkb').value = generateKhaiBaoID();
 
@@ -1898,19 +1929,39 @@
             document.getElementById('viTri').value = '';
 
             // Reset phụ cấp - xử lý đúng cách với Choices.js
-            if (window.phuCapChoices && typeof window.phuCapChoices.destroy === 'function') {
-                try {
-                    window.phuCapChoices.destroy();
+            try {
+                showLoading('Đang làm mới form...');
 
-                    // Xóa tất cả các lựa chọn đã chọn trên phần tử select
-                    const phuCapSelect = document.getElementById('phuCap');
-                    Array.from(phuCapSelect.options).forEach(option => {
-                        option.selected = false;
+                // Hủy instance Choices.js hiện tại nếu có
+                if (window.phuCapChoices && typeof window.phuCapChoices.destroy === 'function') {
+                    window.phuCapChoices.destroy();
+                }
+
+                // Lấy phần tử select gốc
+                const phuCapElement = document.getElementById('phuCap');
+
+                // Xóa tất cả các option hiện tại từ DOM
+                while (phuCapElement.firstChild) {
+                    phuCapElement.removeChild(phuCapElement.firstChild);
+                }
+
+                // Tải lại tất cả các option từ dữ liệu CaiDatPC
+                if (CaiDatPC && CaiDatPC.length > 0) {
+                    // console.log('Dữ liệu phụ cấp đã được tải trước đó:', CaiDatPC);
+                    const phuCapList = [...new Set(CaiDatPC.map(item => item.NHOM || item['Tên phụ cấp']).filter(Boolean))];
+                    // console.log('Danh sách phụ cấp:', phuCapList);
+
+                    phuCapList.forEach(nhom => {
+                        const option = document.createElement('option');
+                        option.value = nhom;
+                        option.textContent = nhom;
+                        phuCapElement.appendChild(option);
                     });
 
-                    // Khởi tạo lại Choices.js sau khi đã xóa các lựa chọn
+
+                    // Khởi tạo lại Choices.js trên phần tử đã làm mới
                     setTimeout(() => {
-                        const choices = new Choices(phuCapSelect, {
+                        window.phuCapChoices = new Choices(phuCapElement, {
                             removeItemButton: true,
                             maxItemCount: -1,
                             searchEnabled: true,
@@ -1918,54 +1969,39 @@
                             placeholderValue: 'Chọn phụ cấp...'
                         });
 
-                        // Store the instance globally for access from other functions
-                        window.phuCapChoices = choices;
-                    }, 100);
-                } catch (error) {
-                    console.warn('Lỗi khi reset choices phụ cấp:', error);
-
-                    // Fallback nếu không thể xử lý với Choices API
-                    try {
-                        // Thử tạo lại từ đầu
-                        const phuCapSelect = document.getElementById('phuCap');
-                        // Xóa tất cả các lựa chọn
-                        while (phuCapSelect.firstChild) {
-                            phuCapSelect.removeChild(phuCapSelect.firstChild);
-                        }
-
-                        // Tải lại các option từ CaiDatPC
-                        if (CaiDatPC && CaiDatPC.length > 0) {
-                            const phuCapList = [...new Set(CaiDatPC.map(item => item.NHOM || item['Tên phụ cấp']).filter(Boolean))];
-
-                            phuCapList.forEach(nhom => {
-                                const option = document.createElement('option');
-                                option.value = nhom;
-                                option.textContent = nhom;
-                                option.selected = false;
-                                phuCapSelect.appendChild(option);
-                            });
-                        }
-
-                        // Khởi tạo lại Choices.js
-                        setTimeout(() => {
-                            window.phuCapChoices = new Choices(phuCapSelect, {
-                                removeItemButton: true,
-                                maxItemCount: -1,
-                                searchEnabled: true,
-                                placeholder: true,
-                                placeholderValue: 'Chọn phụ cấp...'
-                            });
-                        }, 200);
-                    } catch (fallbackError) {
-                        console.error('Fallback cũng thất bại:', fallbackError);
-                    }
+                        hideLoading();
+                    }, 200);
+                } else {
+                    // Nếu không có dữ liệu CaiDatPC, tải lại từ API
+                    loadCaiDatPC().then(() => {
+                        hideLoading();
+                    }).catch(error => {
+                        console.error('Không thể tải lại dữ liệu phụ cấp:', error);
+                        hideLoading();
+                    });
                 }
+            } catch (error) {
+                console.error('Lỗi khi reset phụ cấp:', error);
+                hideLoading();
+
+                // Thông báo lỗi nếu cần
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Lỗi khi làm mới phụ cấp'
+                });
             }
 
             // Ẩn phần chi tiết và làm trống dữ liệu
             chiTietSection.classList.add('hidden');
             chiTietList = [];
-            phuCapList = [];
 
             // Cập nhật trạng thái tiến trình về bước 1
             updateProgressSteps(1);
@@ -1973,7 +2009,7 @@
             // Đặt focus vào trường đầu tiên cần nhập
             setTimeout(() => {
                 document.getElementById('luongToiThieu').focus();
-            }, 200);
+            }, 300);
         }
 
         // Sự kiện khi nhấn nút Hủy
